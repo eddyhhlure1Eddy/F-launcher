@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FuxkComfy Launcher Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #0f1419;
+            --bg-tertiary: #1a1f2e;
+            --bg-elevated: #151b28;
+            --border-color: #1e3a5f;
+            --border-hover: #2563eb;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes boomIn {
+            0% {
+                transform: scale(0.3) rotate(-5deg);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05) rotate(2deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 0;
+            min-width: 420px;
+            max-width: 520px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            animation: boomIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-elevated));
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-message {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .modal-btn-cancel {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .modal-btn-cancel:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-hover);
+        }
+
+        .modal-btn-confirm {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .modal-btn-confirm:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .modal-btn-danger {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        .modal-btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-running .status-dot {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .status-stopped .status-dot {
+            background: var(--accent-red);
+            animation: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-switcher {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 14px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .lang-switcher:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .uptime {
+            font-family: 'Courier New', monospace;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 360px 1fr 280px;
+            gap: 16px;
+            padding: 16px;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 14px 18px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .checkbox-group:hover {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .checkbox-group:active {
+            transform: scale(0.98);
+        }
+
+        .checkbox-input {
+            display: none;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            flex: 1;
+            pointer-events: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--bg-tertiary);
+            border-radius: 13px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .checkbox-input:checked+.checkbox-label+.toggle-switch {
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            border-color: var(--accent-blue);
+        }
+
+        .checkbox-input:checked+.checkbox-label+.toggle-switch::before {
+            left: 24px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
+        }
+
+        .toggle-switch:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .toggle-switch:active::before {
+            width: 22px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-hover);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .section-divider {
+            margin: 16px 0;
+            border: 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin: 16px 0 10px 0;
+            font-weight: 600;
+        }
+
+        .preset-item {
+            padding: 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-item:hover {
+            border-color: var(--accent-blue);
+            background: var(--bg-elevated);
+        }
+
+        .preset-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .logs-container {
+            flex: 1;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            padding: 12px;
+            padding-bottom: 50px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .copy-logs-btn {
+            position: absolute;
+            bottom: 60px;
+            right: 12px;
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .copy-logs-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .copy-logs-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-logs-btn.copied {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: var(--text-muted);
+            margin-right: 8px;
+        }
+
+        .log-info {
+            color: var(--text-secondary);
+        }
+
+        .log-success {
+            color: var(--accent-green);
+        }
+
+        .log-warning {
+            color: var(--accent-yellow);
+        }
+
+        .log-error {
+            color: var(--accent-red);
+        }
+
+        .log-controls {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .log-filter {
+            flex: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            transition: width 0.3s;
+        }
+
+        .gpu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .gpu-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .gpu-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .gpu-stat {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin: 4px 0;
+            color: var(--text-secondary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-color);
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 4px;
+            padding: 0 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .collapsible-section {
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            transition: all 0.3s ease;
+        }
+
+        .collapsible-section:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .collapsible-section.expanded {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-elevated));
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .collapsible-header:hover {
+            background: linear-gradient(135deg, var(--bg-elevated), var(--bg-tertiary));
+        }
+
+        .collapsible-header:active {
+            transform: scale(0.99);
+        }
+
+        .collapsible-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .collapsible-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: var(--accent-blue);
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .collapsible-section.expanded .collapsible-title::before {
+            opacity: 1;
+        }
+
+        .collapsible-arrow {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-secondary);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .collapsible-section.expanded .collapsible-arrow {
+            transform: rotate(180deg);
+            color: var(--accent-blue);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s;
+            padding: 0 14px;
+        }
+
+        .collapsible-section.expanded .collapsible-content {
+            max-height: 500px;
+            padding: 8px 14px 14px 14px;
+            border-top: 1px solid rgba(59, 130, 246, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle"></div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-message" id="modalMessage"></div>
+                <input type="text" class="modal-input" id="modalInput" style="display:none;" />
+                <div class="modal-actions" id="modalActions"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo" data-zh="FuxkComfy 启动器 Pro" data-en="FuxkComfy Launcher Pro">FuxkComfy Launcher Pro
+                </div>
+                <div class="status-indicator" id="statusIndicator">
+                    <div class="status-dot"></div>
+                    <span id="statusText" data-zh="加载中..." data-en="Loading...">Loading...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="lang-switcher" onclick="toggleLanguage()" id="langBtn">中文</button>
+                <div class="uptime" id="uptime">--:--:--</div>
+                <button class="btn btn-success" onclick="startProcess()" id="startBtn" data-zh="启动"
+                    data-en="Start">Start</button>
+                <button class="btn btn-danger" onclick="stopProcess()" id="stopBtn" data-zh="停止"
+                    data-en="Stop">Stop</button>
+                <button class="btn btn-danger" onclick="forceStopProcess()" id="forceStopBtn" data-zh="强制停止"
+                    data-en="Force Stop" style="opacity: 0.8;">Force Stop</button>
+                <button class="btn" onclick="restartProcess()" id="restartBtn" data-zh="重启"
+                    data-en="Restart">Restart</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <div class="tab-container">
+                    <button class="tab active" onclick="switchTab('config')" data-zh="配置"
+                        data-en="Config">Config</button>
+                    <button class="tab" onclick="switchTab('tools')" data-zh="工具" data-en="Tools">Tools</button>
+                    <button class="tab" onclick="switchTab('nodesearch')" data-zh="节点搜索安装" data-en="Node Search">Node Search</button>
+                    <button class="tab" onclick="switchTab('huggingface')" data-zh="HuggingFace下载" data-en="HuggingFace">HuggingFace</button>
+                </div>
+
+                <div class="panel-content">
+                    <div class="tab-content active" id="tab-config">
+                        <div class="form-group">
+                            <label class="form-label" data-zh="端口" data-en="Port">Port</label>
+                            <input type="number" class="form-input" id="port" min="1" max="65535" value="8188">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-zh="监听地址" data-en="Listen Address">Listen Address</label>
+                            <input type="text" class="form-input" id="listen" value="0.0.0.0">
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                            <input type="checkbox" class="checkbox-input" id="autoLaunch" checked>
+                            <label class="checkbox-label" for="autoLaunch" data-zh="自动打开浏览器"
+                                data-en="Auto launch browser">Auto launch browser</label>
+                            <div class="toggle-switch"></div>
+                        </div>
+
+                        <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                            <input type="checkbox" class="checkbox-input" id="gpuOpt" checked>
+                            <label class="checkbox-label" for="gpuOpt" data-zh="GPU 优化" data-en="GPU optimization">GPU
+                                optimization</label>
+                            <div class="toggle-switch"></div>
+                        </div>
+
+                        <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                            <input type="checkbox" class="checkbox-input" id="cpuMode">
+                            <label class="checkbox-label" for="cpuMode" data-zh="CPU 模式" data-en="CPU mode">CPU
+                                mode</label>
+                            <div class="toggle-switch"></div>
+                        </div>
+
+                        <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                            <input type="checkbox" class="checkbox-input" id="autoRestart">
+                            <label class="checkbox-label" for="autoRestart" data-zh="崩溃自动重启"
+                                data-en="Auto restart on crash">Auto restart on crash</label>
+                            <div class="toggle-switch"></div>
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span class="collapsible-title" data-zh="显存模式" data-en="VRAM Mode">VRAM Mode</span>
+                                <span class="collapsible-arrow">▼</span>
+                            </div>
+                            <div class="collapsible-content">
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="lowvram">
+                                    <label class="checkbox-label" for="lowvram" data-zh="低显存" data-en="Low VRAM">Low
+                                        VRAM</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="normalvram">
+                                    <label class="checkbox-label" for="normalvram" data-zh="标准显存"
+                                        data-en="Normal VRAM">Normal VRAM</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="highvram">
+                                    <label class="checkbox-label" for="highvram" data-zh="高显存" data-en="High VRAM">High
+                                        VRAM</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="novram">
+                                    <label class="checkbox-label" for="novram" data-zh="禁用显存管理"
+                                        data-en="No VRAM management">No VRAM</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span class="collapsible-title" data-zh="精度设置 (VAE)" data-en="Precision (VAE)">Precision
+                                    (VAE)</span>
+                                <span class="collapsible-arrow">▼</span>
+                            </div>
+                            <div class="collapsible-content">
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="fp16_vae">
+                                    <label class="checkbox-label" for="fp16_vae">FP16 VAE</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="fp32_vae">
+                                    <label class="checkbox-label" for="fp32_vae">FP32 VAE</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span class="collapsible-title" data-zh="精度设置 (UNet)"
+                                    data-en="Precision (UNet)">Precision (UNet)</span>
+                                <span class="collapsible-arrow">▼</span>
+                            </div>
+                            <div class="collapsible-content">
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="bf16_unet">
+                                    <label class="checkbox-label" for="bf16_unet">BF16 UNet</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="fp16_unet">
+                                    <label class="checkbox-label" for="fp16_unet">FP16 UNet</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="fp8_e4m3fn_unet">
+                                    <label class="checkbox-label" for="fp8_e4m3fn_unet">FP8 E4M3FN UNet</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="fp8_e5m2_unet">
+                                    <label class="checkbox-label" for="fp8_e5m2_unet">FP8 E5M2 UNet</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span class="collapsible-title" data-zh="注意力机制" data-en="Attention">Attention</span>
+                                <span class="collapsible-arrow">▼</span>
+                            </div>
+                            <div class="collapsible-content">
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="dont_upcast_attention">
+                                    <label class="checkbox-label" for="dont_upcast_attention" data-zh="禁止上转注意力"
+                                        data-en="Don't upcast attention">Don't upcast attention</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="force_upcast_attention">
+                                    <label class="checkbox-label" for="force_upcast_attention" data-zh="强制上转注意力"
+                                        data-en="Force upcast attention">Force upcast attention</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="disable_xformers">
+                                    <label class="checkbox-label" for="disable_xformers" data-zh="禁用 xFormers"
+                                        data-en="Disable xFormers">Disable xFormers</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="use_pytorch_cross_attention">
+                                    <label class="checkbox-label" for="use_pytorch_cross_attention"
+                                        data-zh="使用 PyTorch 注意力" data-en="Use PyTorch attention">Use PyTorch cross
+                                        attention</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="use_split_cross_attention">
+                                    <label class="checkbox-label" for="use_split_cross_attention" data-zh="使用 Split 注意力"
+                                        data-en="Use Split attention">Use Split cross attention</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="use_quad_cross_attention">
+                                    <label class="checkbox-label" for="use_quad_cross_attention" data-zh="使用 Quad 注意力"
+                                        data-en="Use Quad attention">Use Quad cross attention</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="use_sage_attention">
+                                    <label class="checkbox-label" for="use_sage_attention" data-zh="使用 Sage 注意力"
+                                        data-en="Use Sage attention">Use Sage attention</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="use_flash_attention">
+                                    <label class="checkbox-label" for="use_flash_attention" data-zh="使用 Flash 注意力"
+                                        data-en="Use Flash attention">Use Flash attention</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span class="collapsible-title" data-zh="其他选项" data-en="Other Options">Other
+                                    Options</span>
+                                <span class="collapsible-arrow">▼</span>
+                            </div>
+                            <div class="collapsible-content">
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="disable_smart_memory">
+                                    <label class="checkbox-label" for="disable_smart_memory" data-zh="禁用智能内存"
+                                        data-en="Disable smart memory">Disable smart memory</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="deterministic">
+                                    <label class="checkbox-label" for="deterministic" data-zh="确定性模式"
+                                        data-en="Deterministic mode">Deterministic</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="directml">
+                                    <label class="checkbox-label" for="directml">DirectML (AMD)</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="gpu_only">
+                                    <label class="checkbox-label" for="gpu_only" data-zh="仅GPU模式"
+                                        data-en="GPU Only mode">GPU Only</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="cpu_vae">
+                                    <label class="checkbox-label" for="cpu_vae" data-zh="CPU VAE" data-en="CPU VAE">CPU
+                                        VAE</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="async_offload">
+                                    <label class="checkbox-label" for="async_offload" data-zh="异步卸载"
+                                        data-en="Async offload">Async offload</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="disable_mmap">
+                                    <label class="checkbox-label" for="disable_mmap" data-zh="禁用 MMap"
+                                        data-en="Disable MMap">Disable MMap</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="checkbox-group" onclick="toggleCheckboxFromGroup(event, this)">
+                                    <input type="checkbox" class="checkbox-input" id="force_channels_last">
+                                    <label class="checkbox-label" for="force_channels_last" data-zh="强制 Channels Last"
+                                        data-en="Force Channels Last">Force Channels Last</label>
+                                    <div class="toggle-switch"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-zh="预留显存 (GB)" data-en="Reserve VRAM (GB)">Reserve
+                                        VRAM (GB)</label>
+                                    <input type="text" class="form-input" id="reserve_vram" placeholder="0.5">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-zh="预览方法" data-en="Preview Method">Preview
+                                        Method</label>
+                                    <select class="form-select" id="preview_method">
+                                        <option value="auto">Auto</option>
+                                        <option value="latent2rgb">Latent2RGB</option>
+                                        <option value="taesd">TAESD</option>
+                                        <option value="none">None</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" data-zh="预览尺寸" data-en="Preview Size">Preview Size</label>
+                                    <input type="text" class="form-input" id="preview_size" placeholder="512">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <div class="form-group">
+                            <label class="form-label" data-zh="额外参数" data-en="Extra Arguments">Extra Arguments</label>
+                            <textarea class="form-textarea" id="extraArgs" placeholder="--cache-lru 32"></textarea>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="saveConfig()" data-zh="保存配置"
+                                data-en="Save Config">Save Config</button>
+                            <button class="btn" onclick="openComfy()" data-zh="打开界面" data-en="Open UI">Open UI</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-tools">
+                        <div class="section-title" data-zh="Python 环境" data-en="Python Environment">Python Environment
+                        </div>
+                        <div id="pythonInfo"
+                            style="background: var(--bg-primary); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-family: monospace; font-size: 12px;">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-zh="自定义 Python 路径" data-en="Custom Python Path">Custom Python
+                                Path</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" class="form-input" id="pythonExecutable"
+                                    placeholder="C:\Python312\python.exe"
+                                    style="flex: 1; min-width: 200px; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 13px; font-family: monospace;">
+                                <button class="btn" onclick="browsePythonPath()" data-zh="浏览"
+                                    data-en="Browse">Browse</button>
+                                <button class="btn btn-primary" onclick="savePythonPath()" data-zh="保存"
+                                    data-en="Save">Save</button>
+                            </div>
+                        </div>
+
+                        <div id="pythonList" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;"></div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            <button class="btn btn-primary" onclick="scanPythonEnvironments(false)" data-zh="快速扫描"
+                                data-en="Quick Scan" style="flex: 1;">Quick Scan</button>
+                            <button class="btn" onclick="scanPythonEnvironments(true)" data-zh="完整扫描"
+                                data-en="Full Scan" style="flex: 1;">Full Scan</button>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; text-align: center;"
+                            data-zh="快速扫描：仅项目Python | 完整扫描：包含系统Python"
+                            data-en="Quick Scan: Project Only | Full Scan: Include System">Quick Scan: Project Only |
+                            Full Scan: Include System</div>
+
+                        <hr class="section-divider">
+
+                        <div class="section-title" data-zh="依赖管理" data-en="Dependencies">Dependencies</div>
+                        <div id="depsInfo"
+                            style="background: var(--bg-primary); padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn" onclick="checkDependencies()" data-zh="扫描依赖"
+                                data-en="Scan Dependencies">Scan Dependencies</button>
+                            <button class="btn btn-primary" onclick="installDependencies()" data-zh="安装缺失依赖"
+                                data-en="Install Missing">Install Missing</button>
+                        </div>
+
+                        <hr class="section-divider">
+
+                        <div class="section-title" data-zh="PyTorch 管理" data-en="PyTorch Management">PyTorch Management</div>
+                        <div id="pytorchInfo" style="background: var(--bg-primary); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-family: monospace; font-size: 12px;"></div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-zh="选择版本" data-en="Select Version">Select Version</label>
+                            <select id="pytorchVersionSelect" style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 13px; margin-bottom: 8px;">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-success" onclick="installPyTorch()" data-zh="安装 PyTorch" data-en="Install PyTorch" style="width: 100%; margin-bottom: 16px;">Install PyTorch</button>
+                        <button class="btn" onclick="checkPyTorchInfo()" data-zh="检查 PyTorch" data-en="Check PyTorch" style="width: 100%; margin-bottom: 16px;">Check PyTorch</button>
+
+                        <hr class="section-divider">
+
+                        <div class="section-title" data-zh="自定义节点" data-en="Custom Nodes">Custom Nodes</div>
+                        <div class="form-group">
+                            <label class="form-label" data-zh="Git 仓库地址" data-en="Git Repository URL">Git Repository
+                                URL</label>
+                            <input type="text" class="form-input" id="gitUrl"
+                                placeholder="https://github.com/user/repo.git">
+                        </div>
+                        <button class="btn btn-success" onclick="installNodeFromGit()" data-zh="从 Git 安装"
+                            data-en="Install from Git" style="width: 100%; margin-bottom: 16px;">Install from
+                            Git</button>
+
+                        <div id="customNodesList" style="max-height: 300px; overflow-y: auto;"></div>
+                        <button class="btn" onclick="scanCustomNodes()" data-zh="扫描自定义节点" data-en="Scan Custom Nodes"
+                            style="width: 100%;">Scan Custom Nodes</button>
+                    </div>
+
+                    <div class="tab-content" id="tab-nodesearch">
+                        <div class="section-title" data-zh="节点搜索安装" data-en="Node Search & Install">Node Search & Install</div>
+                        <div class="form-group">
+                            <label class="form-label" data-zh="搜索作者名称" data-en="Search Author Name">Search Author Name</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" class="form-input" id="authorSearch"
+                                    placeholder="e.g., ltdrdata, kijai, Kosinkadink"
+                                    style="flex: 1;"
+                                    onkeypress="if(event.key==='Enter')searchNodesByAuthor()">
+                                <button class="btn btn-primary" onclick="searchNodesByAuthor()" data-zh="搜索"
+                                    data-en="Search">Search</button>
+                            </div>
+                        </div>
+                        <div id="nodeSearchResults" style="max-height: 600px; overflow-y: auto; margin-top: 16px;"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-huggingface">
+                        <div class="section-title" data-zh="HuggingFace 模型下载" data-en="HuggingFace Model Download">HuggingFace Model Download</div>
+                        <div class="form-group">
+                            <label class="form-label" data-zh="模型 URL 或 ID" data-en="Model URL or ID">Model URL or ID</label>
+                            <input type="text" class="form-input" id="hfModelUrl"
+                                placeholder="e.g., black-forest-labs/FLUX.1-dev or https://huggingface.co/..."
+                                style="max-width: 600px;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-zh="保存路径" data-en="Save Path">Save Path</label>
+                            <select class="form-input" id="hfSavePath" style="max-width: 400px;">
+                                <option value="models/checkpoints">models/checkpoints</option>
+                                <option value="models/unet">models/unet</option>
+                                <option value="models/clip">models/clip</option>
+                                <option value="models/vae">models/vae</option>
+                                <option value="models/loras">models/loras</option>
+                                <option value="models/embeddings">models/embeddings</option>
+                                <option value="models/controlnet">models/controlnet</option>
+                                <option value="models/upscale_models">models/upscale_models</option>
+                                <option value="custom">Custom Path...</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="hfCustomPathGroup" style="display: none;">
+                            <input type="text" class="form-input" id="hfCustomPath" placeholder="Enter custom path..." style="max-width: 600px;">
+                        </div>
+                        <button class="btn btn-primary" onclick="downloadHuggingFaceModel()" data-zh="开始下载" data-en="Start Download" style="max-width: 200px;">Start Download</button>
+                        <div id="hfDownloadStatus" style="margin-top: 16px; max-width: 800px;"></div>
+                        <div id="hfDownloadProgress" style="max-height: 400px; overflow-y: auto; margin-top: 16px;"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="tab-container">
+                    <button class="tab active" onclick="switchLogTab('all')" data-zh="全部" data-en="All">All</button>
+                    <button class="tab" onclick="switchLogTab('error')" data-zh="错误" data-en="Errors">Errors</button>
+                    <button class="tab" onclick="switchLogTab('warning')" data-zh="警告"
+                        data-en="Warnings">Warnings</button>
+                    <button class="tab" onclick="switchLogTab('success')" data-zh="成功"
+                        data-en="Success">Success</button>
+                </div>
+
+                <div class="panel-content" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; position: relative;">
+                    <div class="logs-container" id="logs"></div>
+                    <button class="copy-logs-btn" onclick="copyLogs()" id="copyLogsBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span data-zh="复制" data-en="Copy">Copy</span>
+                    </button>
+                    <div class="log-controls">
+                        <input type="text" class="form-input log-filter" id="logSearch" placeholder="Search logs...">
+                        <button class="btn" onclick="clearLogs()" data-zh="清空" data-en="Clear">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header" data-zh="系统监控" data-en="System Monitor">System Monitor</div>
+                <div class="panel-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label" data-zh="CPU 使用率" data-en="CPU Usage">CPU Usage</div>
+                            <div class="stat-value" id="cpuValue">0%</div>
+                            <div class="stat-bar">
+                                <div class="stat-bar-fill" id="cpuBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label" data-zh="内存" data-en="Memory">Memory</div>
+                            <div class="stat-value" id="memValue">0 GB</div>
+                            <div class="stat-bar">
+                                <div class="stat-bar-fill" id="memBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div id="gpuSection"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLogLevel = 'all';
+        let currentTab = 'config';
+        let currentLanguage = localStorage.getItem('language') || 'en';
+        let modalResolve = null;
+
+        const i18n = {
+            zh: {
+                stopConfirm: '确认停止 FuxkComfy 进程吗?',
+                restartConfirm: '确认重启 FuxkComfy 进程吗?',
+                deletePresetConfirm: '确认删除预设 "{name}" 吗?',
+                enterPresetName: '请输入预设名称:',
+                running: '运行中',
+                stopped: '已停止',
+                noGpu: '未检测到 GPU',
+                confirm: '确认',
+                cancel: '取消',
+                delete: '删除',
+                warning: '警告',
+                prompt: '提示'
+            },
+            en: {
+                stopConfirm: 'Stop FuxkComfy process?',
+                restartConfirm: 'Restart FuxkComfy process?',
+                deletePresetConfirm: 'Delete preset "{name}"?',
+                enterPresetName: 'Enter preset name:',
+                running: 'Running',
+                stopped: 'Stopped',
+                noGpu: 'No GPU detected',
+                confirm: 'Confirm',
+                cancel: 'Cancel',
+                delete: 'Delete',
+                warning: 'Warning',
+                prompt: 'Prompt'
+            }
+        };
+
+        function t(key, vars = {}) {
+            let text = i18n[currentLanguage][key] || key;
+            Object.keys(vars).forEach(k => {
+                text = text.replace(`{${k}}`, vars[k]);
+            });
+            return text;
+        }
+
+        function updateLanguage() {
+            const logsContainer = document.getElementById('logs');
+            const logsScrollTop = logsContainer ? logsContainer.scrollTop : 0;
+
+            document.querySelectorAll('[data-zh]').forEach(el => {
+                if (logsContainer && logsContainer.contains(el)) {
+                    return;
+                }
+
+                const text = currentLanguage === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en');
+                if (el.tagName === 'INPUT' && el.type === 'text') {
+                    el.placeholder = text;
+                } else if (el.tagName === 'BUTTON' || el.tagName === 'LABEL' || el.tagName === 'SPAN' || el.tagName === 'DIV') {
+                    el.textContent = text;
+                } else {
+                    el.innerHTML = text;
+                }
+            });
+
+            const langBtn = document.getElementById('langBtn');
+            if (langBtn) {
+                langBtn.textContent = currentLanguage === 'zh' ? 'EN' : '中文';
+            }
+
+            if (logsContainer) {
+                logsContainer.scrollTop = logsScrollTop;
+            }
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('language', currentLanguage);
+            updateLanguage();
+        }
+
+        function toggleCheckbox(id) {
+            const checkbox = document.getElementById(id);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+            }
+        }
+
+        function toggleCheckboxFromGroup(event, groupElement) {
+            event.stopPropagation();
+            const checkbox = groupElement.querySelector('.checkbox-input');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                saveConfigAuto();
+            }
+        }
+
+        function saveConfigAuto() {
+            const config = getAllConfig();
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            }).catch(err => console.error('Auto-save failed:', err));
+        }
+
+        function showModal(title, message, type = 'confirm', showInput = false) {
+            return new Promise((resolve) => {
+                modalResolve = resolve;
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+
+                const input = document.getElementById('modalInput');
+                if (showInput) {
+                    input.style.display = 'block';
+                    input.value = '';
+                    input.focus();
+                } else {
+                    input.style.display = 'none';
+                }
+
+                const actions = document.getElementById('modalActions');
+                actions.innerHTML = '';
+
+                if (type === 'confirm' || type === 'prompt') {
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'modal-btn modal-btn-cancel';
+                    cancelBtn.textContent = t('cancel');
+                    cancelBtn.onclick = () => {
+                        closeModal();
+                        resolve(null);
+                    };
+                    actions.appendChild(cancelBtn);
+
+                    const confirmBtn = document.createElement('button');
+                    confirmBtn.className = 'modal-btn modal-btn-confirm';
+                    confirmBtn.textContent = t('confirm');
+                    confirmBtn.onclick = () => {
+                        const result = showInput ? input.value : true;
+                        closeModal();
+                        resolve(result);
+                    };
+                    actions.appendChild(confirmBtn);
+                } else if (type === 'delete') {
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'modal-btn modal-btn-cancel';
+                    cancelBtn.textContent = t('cancel');
+                    cancelBtn.onclick = () => {
+                        closeModal();
+                        resolve(false);
+                    };
+                    actions.appendChild(cancelBtn);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'modal-btn modal-btn-danger';
+                    deleteBtn.textContent = t('delete');
+                    deleteBtn.onclick = () => {
+                        closeModal();
+                        resolve(true);
+                    };
+                    actions.appendChild(deleteBtn);
+                }
+
+                document.getElementById('modalOverlay').classList.add('active');
+            });
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== document.getElementById('modalOverlay')) return;
+            document.getElementById('modalOverlay').classList.remove('active');
+            if (modalResolve) {
+                modalResolve(null);
+                modalResolve = null;
+            }
+        }
+
+        function toggleSection(header) {
+            header.parentElement.classList.toggle('expanded');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const tabContainer = event.target.closest('.tab-container');
+            tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const panel = tabContainer.closest('.panel');
+            panel.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            panel.querySelector('#tab-' + tab).classList.add('active');
+
+            if (tab === 'presets') {
+                loadPresets();
+            }
+        }
+
+        function switchLogTab(level) {
+            currentLogLevel = level;
+            const tabContainer = event.target.closest('.tab-container');
+            tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            updateLogs();
+        }
+
+        function updateStatus() {
+            fetch('/api/status')
+                .then(res => res.json())
+                .then(data => {
+                    const indicator = document.getElementById('statusIndicator');
+                    const statusText = document.getElementById('statusText');
+
+                    if (data.running) {
+                        indicator.className = 'status-indicator status-running';
+                        statusText.textContent = t('running');
+                    } else {
+                        indicator.className = 'status-indicator status-stopped';
+                        statusText.textContent = t('stopped');
+                    }
+
+                    document.getElementById('uptime').textContent = data.uptime || '--:--:--';
+
+                    if (data.config) {
+                        document.getElementById('port').value = data.config.port;
+                        document.getElementById('listen').value = data.config.listen;
+                        document.getElementById('autoLaunch').checked = data.config.auto_launch;
+                        document.getElementById('gpuOpt').checked = data.config.gpu_opt;
+                        document.getElementById('cpuMode').checked = data.config.cpu_mode;
+                        document.getElementById('lowvram').checked = data.config.lowvram || false;
+                        document.getElementById('normalvram').checked = data.config.normalvram || false;
+                        document.getElementById('highvram').checked = data.config.highvram || false;
+                        document.getElementById('novram').checked = data.config.novram || false;
+                        document.getElementById('fp16_vae').checked = data.config.fp16_vae || false;
+                        document.getElementById('fp32_vae').checked = data.config.fp32_vae || false;
+                        document.getElementById('bf16_unet').checked = data.config.bf16_unet || false;
+                        document.getElementById('fp16_unet').checked = data.config.fp16_unet || false;
+                        document.getElementById('fp8_e4m3fn_unet').checked = data.config.fp8_e4m3fn_unet || false;
+                        document.getElementById('fp8_e5m2_unet').checked = data.config.fp8_e5m2_unet || false;
+                        document.getElementById('disable_smart_memory').checked = data.config.disable_smart_memory || false;
+                        document.getElementById('deterministic').checked = data.config.deterministic || false;
+                        document.getElementById('dont_upcast_attention').checked = data.config.dont_upcast_attention || false;
+                        document.getElementById('force_upcast_attention').checked = data.config.force_upcast_attention || false;
+                        document.getElementById('disable_xformers').checked = data.config.disable_xformers || false;
+                        document.getElementById('use_pytorch_cross_attention').checked = data.config.use_pytorch_cross_attention || false;
+                        document.getElementById('use_split_cross_attention').checked = data.config.use_split_cross_attention || false;
+                        document.getElementById('use_quad_cross_attention').checked = data.config.use_quad_cross_attention || false;
+                        document.getElementById('use_sage_attention').checked = data.config.use_sage_attention || false;
+                        document.getElementById('use_flash_attention').checked = data.config.use_flash_attention || false;
+                        document.getElementById('directml').checked = data.config.directml || false;
+                        document.getElementById('gpu_only').checked = data.config.gpu_only || false;
+                        document.getElementById('reserve_vram').value = data.config.reserve_vram || '';
+                        document.getElementById('cpu_vae').checked = data.config.cpu_vae || false;
+                        document.getElementById('async_offload').checked = data.config.async_offload || false;
+                        document.getElementById('disable_mmap').checked = data.config.disable_mmap || false;
+                        document.getElementById('force_channels_last').checked = data.config.force_channels_last || false;
+                        document.getElementById('preview_method').value = data.config.preview_method || 'auto';
+                        document.getElementById('preview_size').value = data.config.preview_size || '';
+                        document.getElementById('autoRestart').checked = data.config.auto_restart || false;
+                        document.getElementById('extraArgs').value = data.config.extra_args || '';
+                        if (document.getElementById('pythonExecutable')) {
+                            document.getElementById('pythonExecutable').value = data.config.python_executable || '';
+                        }
+
+                        if (data.config.language && !localStorage.getItem('language')) {
+                            currentLanguage = data.config.language;
+                            localStorage.setItem('language', currentLanguage);
+                            updateLanguage();
+                        }
+                    }
+                });
+        }
+
+        function updateSystemMonitor() {
+            fetch('/api/system')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('cpuValue').textContent = data.cpu.toFixed(1) + '%';
+                    document.getElementById('cpuBar').style.width = data.cpu + '%';
+
+                    const mem = data.memory;
+                    document.getElementById('memValue').textContent = mem.used_gb + ' / ' + mem.total_gb + ' GB';
+                    document.getElementById('memBar').style.width = mem.percent + '%';
+
+                    const gpuSection = document.getElementById('gpuSection');
+                    if (data.gpu && data.gpu.length > 0) {
+                        gpuSection.innerHTML = '<div class="gpu-list">' + data.gpu.map(gpu => `
+                            <div class="gpu-card">
+                                <div class="gpu-name">${gpu.name}</div>
+                                <div class="gpu-stat">
+                                    <span>Load:</span>
+                                    <span>${gpu.load}%</span>
+                                </div>
+                                <div class="gpu-stat">
+                                    <span>Memory:</span>
+                                    <span>${gpu.memory_used} / ${gpu.memory_total} GB</span>
+                                </div>
+                                <div class="gpu-stat">
+                                    <span>Temp:</span>
+                                    <span>${gpu.temperature}°C</span>
+                                </div>
+                            </div>
+                        `).join('') + '</div>';
+                    } else {
+                        gpuSection.innerHTML = '<div class="stat-card"><div class="stat-label">' + t('noGpu') + '</div></div>';
+                    }
+                });
+        }
+
+        let userScrolledLogs = false;
+        let savedScrollPosition = 0;
+        let lastLogCount = 0;
+
+        function updateLogs() {
+            const search = document.getElementById('logSearch').value;
+            fetch(`/api/logs?level=${currentLogLevel}&search=${encodeURIComponent(search)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.logs.length === lastLogCount) {
+                        return;
+                    }
+                    lastLogCount = data.logs.length;
+
+                    const logsDiv = document.getElementById('logs');
+                    const wasScrolledToBottom = (logsDiv.scrollHeight - logsDiv.scrollTop - logsDiv.clientHeight) < 50;
+
+                    if (userScrolledLogs && !wasScrolledToBottom) {
+                        savedScrollPosition = logsDiv.scrollTop;
+                    }
+
+                    logsDiv.innerHTML = data.logs.map(log =>
+                        `<div class="log-entry log-${log.level}"><span class="log-timestamp">[${log.timestamp}]</span>${log.message}</div>`
+                    ).join('');
+
+                    requestAnimationFrame(() => {
+                        if (userScrolledLogs && !wasScrolledToBottom) {
+                            logsDiv.scrollTop = savedScrollPosition;
+                        } else {
+                            logsDiv.scrollTop = logsDiv.scrollHeight;
+                            userScrolledLogs = false;
+                        }
+                    });
+                });
+        }
+
+        function getAllConfig() {
+            return {
+                port: document.getElementById('port').value,
+                listen: document.getElementById('listen').value,
+                auto_launch: document.getElementById('autoLaunch').checked,
+                gpu_opt: document.getElementById('gpuOpt').checked,
+                cpu_mode: document.getElementById('cpuMode').checked,
+                lowvram: document.getElementById('lowvram').checked,
+                normalvram: document.getElementById('normalvram').checked,
+                highvram: document.getElementById('highvram').checked,
+                novram: document.getElementById('novram').checked,
+                fp16_vae: document.getElementById('fp16_vae').checked,
+                fp32_vae: document.getElementById('fp32_vae').checked,
+                bf16_unet: document.getElementById('bf16_unet').checked,
+                fp16_unet: document.getElementById('fp16_unet').checked,
+                fp8_e4m3fn_unet: document.getElementById('fp8_e4m3fn_unet').checked,
+                fp8_e5m2_unet: document.getElementById('fp8_e5m2_unet').checked,
+                disable_smart_memory: document.getElementById('disable_smart_memory').checked,
+                deterministic: document.getElementById('deterministic').checked,
+                dont_upcast_attention: document.getElementById('dont_upcast_attention').checked,
+                force_upcast_attention: document.getElementById('force_upcast_attention').checked,
+                disable_xformers: document.getElementById('disable_xformers').checked,
+                use_pytorch_cross_attention: document.getElementById('use_pytorch_cross_attention').checked,
+                use_split_cross_attention: document.getElementById('use_split_cross_attention').checked,
+                use_quad_cross_attention: document.getElementById('use_quad_cross_attention').checked,
+                use_sage_attention: document.getElementById('use_sage_attention').checked,
+                use_flash_attention: document.getElementById('use_flash_attention').checked,
+                directml: document.getElementById('directml').checked,
+                gpu_only: document.getElementById('gpu_only').checked,
+                reserve_vram: document.getElementById('reserve_vram').value,
+                cpu_vae: document.getElementById('cpu_vae').checked,
+                async_offload: document.getElementById('async_offload').checked,
+                disable_mmap: document.getElementById('disable_mmap').checked,
+                force_channels_last: document.getElementById('force_channels_last').checked,
+                preview_method: document.getElementById('preview_method').value,
+                preview_size: document.getElementById('preview_size').value,
+                auto_restart: document.getElementById('autoRestart').checked,
+                extra_args: document.getElementById('extraArgs').value,
+                python_executable: document.getElementById('pythonExecutable') ? document.getElementById('pythonExecutable').value : '',
+                language: currentLanguage
+            };
+        }
+
+        function saveConfig() {
+            const config = getAllConfig();
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            }).then(() => updateStatus());
+        }
+
+        async function startProcess() {
+            saveConfig();
+            setTimeout(() => {
+                fetch('/api/start', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(() => setTimeout(updateStatus, 500));
+            }, 300);
+        }
+
+        async function stopProcess() {
+            try {
+                console.log('stopProcess called');
+                const res = await fetch('/api/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ force: false })
+                });
+                const data = await res.json();
+                console.log('stop result:', data);
+                setTimeout(updateStatus, 500);
+                if (!data.success) {
+                    await showModal(t('error'), data.message || 'Failed to stop process', 'confirm');
+                }
+            } catch (error) {
+                console.error('stopProcess error:', error);
+                alert('Error stopping process: ' + error.message);
+            }
+        }
+
+        async function restartProcess() {
+            try {
+                console.log('restartProcess called');
+                const res = await fetch('/api/restart', { method: 'POST' });
+                const data = await res.json();
+                console.log('restart result:', data);
+                setTimeout(updateStatus, 500);
+                if (!data.success) {
+                    await showModal(t('error'), data.message || 'Failed to restart process', 'confirm');
+                }
+            } catch (error) {
+                console.error('restartProcess error:', error);
+                alert('Error restarting process: ' + error.message);
+            }
+        }
+
+        async function forceStopProcess() {
+            try {
+                console.log('forceStopProcess called');
+                const res = await fetch('/api/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ force: true })
+                });
+                const data = await res.json();
+                console.log('force stop result:', data);
+                setTimeout(updateStatus, 500);
+                if (!data.success) {
+                    await showModal(t('error'), data.message || 'Failed to force stop process', 'confirm');
+                }
+            } catch (error) {
+                console.error('forceStopProcess error:', error);
+                alert('Error force stopping process: ' + error.message);
+            }
+        }
+
+        function clearLogs() {
+            fetch('/api/logs/clear', { method: 'POST' })
+                .then(() => updateLogs());
+        }
+
+        function copyLogs() {
+            const logsContainer = document.getElementById('logs');
+            const logEntries = logsContainer.querySelectorAll('.log-entry');
+            const btn = document.getElementById('copyLogsBtn');
+            const btnText = btn.querySelector('span');
+
+            let logsText = '';
+            logEntries.forEach(entry => {
+                logsText += entry.textContent.trim() + '\n';
+            });
+
+            navigator.clipboard.writeText(logsText).then(() => {
+                btn.classList.add('copied');
+                const currentLang = document.documentElement.getAttribute('data-lang') || 'zh';
+                const originalText = btnText.textContent;
+                btnText.textContent = currentLang === 'zh' ? '已复制' : 'Copied';
+
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btnText.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy logs:', err);
+                const currentLang = document.documentElement.getAttribute('data-lang') || 'zh';
+                alert(currentLang === 'zh' ? '复制失败' : 'Failed to copy');
+            });
+        }
+
+        function openComfy() {
+            const port = document.getElementById('port').value;
+            window.open(`http://127.0.0.1:${port}`, '_blank');
+        }
+
+        function loadPresets() {
+            fetch('/api/presets')
+                .then(res => res.json())
+                .then(data => {
+                    const list = document.getElementById('presetsList');
+                    list.innerHTML = Object.keys(data.presets).map(name => `
+                        <div class="preset-item" onclick="applyPreset('${name}')">
+                            <span class="preset-name">${name}</span>
+                            ${name !== 'default' ? `<button class="btn btn-danger" onclick="event.stopPropagation(); deletePreset('${name}')" style="padding: 4px 10px; font-size: 12px;">${t('delete')}</button>` : ''}
+                        </div>
+                    `).join('');
+                });
+        }
+
+        function applyPreset(name) {
+            fetch('/api/presets')
+                .then(res => res.json())
+                .then(data => {
+                    const preset = data.presets[name];
+                    if (preset) {
+                        Object.keys(preset).forEach(key => {
+                            const el = document.getElementById(key);
+                            if (el) {
+                                if (el.type === 'checkbox') {
+                                    el.checked = preset[key];
+                                } else {
+                                    el.value = preset[key];
+                                }
+                            }
+                        });
+                        saveConfig();
+                        switchTab('config');
+                    }
+                });
+        }
+
+        async function saveAsPreset() {
+            const name = await showModal(t('prompt'), t('enterPresetName'), 'prompt', true);
+            if (name) {
+                const config = getAllConfig();
+                fetch('/api/presets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, config })
+                }).then(() => loadPresets());
+            }
+        }
+
+        async function deletePreset(name) {
+            const confirmed = await showModal(t('warning'), t('deletePresetConfirm', { name }), 'delete');
+            if (confirmed) {
+                fetch(`/api/presets/${name}`, { method: 'DELETE' })
+                    .then(() => loadPresets());
+            }
+        }
+
+        document.getElementById('logSearch').addEventListener('input', updateLogs);
+
+        function checkPyTorchInfo() {
+            fetch('/api/pytorch/info')
+                .then(res => res.json())
+                .then(data => {
+                    const info = document.getElementById('pytorchInfo');
+                    const currentLang = document.documentElement.getAttribute('data-lang') || 'zh';
+                    if (data.installed) {
+                        const cudaStatus = data.cuda_available
+                            ? '<span style="color: var(--accent-green);">' + (currentLang === 'zh' ? 'CUDA 可用' : 'CUDA Available') + '</span>'
+                            : '<span style="color: var(--accent-red);">' + (currentLang === 'zh' ? 'CPU 版本' : 'CPU Only') + '</span>';
+                        info.innerHTML = '<div><strong>' + (currentLang === 'zh' ? '版本' : 'Version') + ':</strong> ' + data.version + '</div><div><strong>' + (currentLang === 'zh' ? 'CUDA 状态' : 'CUDA Status') + ':</strong> ' + cudaStatus + '</div>' + (data.cuda_version && data.cuda_version !== 'N/A' ? '<div><strong>' + (currentLang === 'zh' ? 'CUDA 版本' : 'CUDA Version') + ':</strong> ' + data.cuda_version + '</div>' : '') + '<div style="color: var(--text-secondary); font-size: 11px; margin-top: 4px;">' + (currentLang === 'zh' ? '使用 Python' : 'Using Python') + ': ' + data.using_python + '</div>';
+                    } else {
+                        info.innerHTML = '<div style="color: var(--accent-yellow);">' + (currentLang === 'zh' ? 'PyTorch 未安装' : 'PyTorch not installed') + '</div>';
+                    }
+                });
+        }
+
+        function loadPyTorchVersions() {
+            fetch('/api/pytorch/versions')
+                .then(res => res.json())
+                .then(data => {
+                    const select = document.getElementById('pytorchVersionSelect');
+                    select.innerHTML = '<option value="">' + (document.documentElement.getAttribute('data-lang') === 'zh' ? '选择 PyTorch 版本' : 'Select PyTorch Version') + '</option>';
+                    for (const key in data) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = data[key];
+                        select.appendChild(option);
+                    }
+                });
+        }
+
+        async function installPyTorch() {
+            const select = document.getElementById('pytorchVersionSelect');
+            const version_key = select.value;
+            if (!version_key) {
+                const currentLang = document.documentElement.getAttribute('data-lang') || 'zh';
+                await showModal(
+                    currentLang === 'zh' ? '错误' : 'Error',
+                    currentLang === 'zh' ? '请选择一个 PyTorch 版本' : 'Please select a PyTorch version',
+                    'confirm'
+                );
+                return;
+            }
+            const btn = event.target;
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            const currentLang = document.documentElement.getAttribute('data-lang') || 'zh';
+            btn.textContent = currentLang === 'zh' ? '安装中...' : 'Installing...';
+            try {
+                const res = await fetch('/api/pytorch/install', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ version_key: version_key })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await showModal(
+                        currentLang === 'zh' ? '已启动' : 'Started',
+                        currentLang === 'zh' ? 'PyTorch 安装已在后台启动！请查看右侧日志面板查看实时进度。安装可能需要 5-15 分钟。' : 'PyTorch installation started in background! Check the log panel on the right for real-time progress. Installation may take 5-15 minutes.',
+                        'confirm'
+                    );
+                } else {
+                    await showModal(
+                        currentLang === 'zh' ? '错误' : 'Error',
+                        currentLang === 'zh' ? '启动 PyTorch 安装失败' : 'Failed to start PyTorch installation',
+                        'confirm'
+                    );
+                }
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        updateLanguage();
+        updateStatus();
+        updateSystemMonitor();
+        updateLogs();
+        loadPyTorchVersions();
+        checkPyTorchInfo();
+
+        const logsContainer = document.getElementById('logs');
+        if (logsContainer) {
+            logsContainer.addEventListener('wheel', function(e) {
+                if (e.deltaY < 0) {
+                    userScrolledLogs = true;
+                }
+            });
+
+            logsContainer.addEventListener('scroll', function() {
+                const isAtBottom = (this.scrollHeight - this.scrollTop - this.clientHeight) < 50;
+                if (isAtBottom) {
+                    userScrolledLogs = false;
+                }
+            });
+        }
+
+        setInterval(updateStatus, 2000);
+        setInterval(updateSystemMonitor, 3000);
+        setInterval(updateLogs, 2000);
+    </script>
+    <script src="launcher_tools.js"></script>
+</body>
+
+</html>
